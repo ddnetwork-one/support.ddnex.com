@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- =========================================
+         META INFO
+         ========================================= -->
+    <title>Support Center | DDNEX®</title>
+    <meta name="description" content="Contact DDNEX® Support. Intelligent routing for complaints, billing, and technical issues.">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#2563eb">
+    
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png" sizes="32x32" href="https://i.ibb.co/SD7QzyYw/favicon-white-ddnex.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/SD7QzyYw/favicon-white-ddnex.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!-- SITE CUSTOM STYLES -->
+    <style>
+        /* =========================================
+           VARIABLES & RESET
+           ========================================= */
+        :root {
+            /* Palette */
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: rgba(37, 99, 235, 0.1);
+            --accent: #0f172a;
+            
+            /* Neutrals */
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            
+            --border-color: #e2e8f0;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025);
+            --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.15);
+            
+            /* Typography */
+            --font-main: 'Inter', system-ui, sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+            
+            /* Layout */
+            --header-height: 70px;
+            --radius-md: 12px;
+            --radius-lg: 24px;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html { 
+            scroll-behavior: smooth; 
+            font-size: 16px; 
+        }
+        
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6; 
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* =========================================
+           ANIMATION BACKGROUND (CANVAS)
+           ========================================= */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* =========================================
+           UTILITIES & ANIMATIONS
+           ========================================= */
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+        img { display: block; }
+        button { cursor: pointer; border: none; font-family: inherit; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px; 
+            position: relative;
+            width: 100%; 
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* =========================================
+           HEADER
+           ========================================= */
+        header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--header-height);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+            transition: all 0.4s ease;
+        }
+        header.scrolled {
+            height: 60px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow-sm);
+        }
+
+        header .container {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo { height: 32px; width: auto; }
+        @media(min-width: 768px) { .brand-logo { height: 36px; } }
+
+        .nav-actions { display: flex; gap: 12px; align-items: center; }
+
+        .btn {
+            padding: 10px 20px; 
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 14px; 
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.4);
+        }
+
+        /* =========================================
+           HERO SECTION
+           ========================================= */
+        main { padding-top: calc(var(--header-height) + 60px); min-height: 80vh; display: flex; flex-direction: column; justify-content: center; }
+
+        .hero-text {
+            text-align: center;
+            margin-bottom: 60px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 100px;
+            font-size: 0.8rem; 
+            font-weight: 700;
+            margin-bottom: 20px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #1e293b 0%, #2563eb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        /* =========================================
+           GRID LAYOUT
+           ========================================= */
+        .support-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+        @media(min-width: 992px) {
+            .support-grid { grid-template-columns: 0.9fr 1.3fr; gap: 60px; align-items: start; }
+        }
+
+        /* =========================================
+           SIDEBAR CARDS
+           ========================================= */
+        .info-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            border: 1px solid white;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 20px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Hover Effect: Border Glow */
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--primary);
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .info-card:hover { transform: translateY(-5px) scale(1.01); box-shadow: var(--shadow-lg); background: white; }
+        .info-card:hover::before { opacity: 1; }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .card-icon {
+            width: 44px; height: 44px;
+            background: #eff6ff;
+            color: var(--primary);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            transition: 0.3s;
+        }
+        .info-card:hover .card-icon { background: var(--primary); color: white; transform: rotate(-5deg); }
+
+        .card-title { font-weight: 700; font-size: 18px; font-family: var(--font-heading); }
+        .card-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 0; }
+
+        /* =========================================
+           FORM STYLES
+           ========================================= */
+        .form-wrapper {
+            background: white;
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid white;
+            position: relative;
+        }
+        @media(min-width: 768px) { .form-wrapper { padding: 40px; } }
+
+        .form-header { margin-bottom: 24px; border-bottom: 1px solid #f1f5f9; padding-bottom: 20px; }
+        .form-header h2 { font-family: var(--font-heading); font-size: 24px; margin-bottom: 4px; }
+        .form-header p { font-size: 14px; color: var(--text-secondary); }
+        
+        /* Dynamic Routing Indicator */
+        .routing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: #f0fdf4;
+            color: #166534;
+            margin-top: 12px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: 0.3s;
+        }
+        .routing-indicator.visible { opacity: 1; transform: translateY(0); }
+        .routing-indicator i { font-size: 14px; }
+
+        .form-group { margin-bottom: 20px; position: relative; }
+        .form-group label {
+            display: block;
+            font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-main);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px; 
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #f8fafc;
+            transition: all 0.3s;
+            font-size: 15px;
+            color: var(--text-main);
+        }
+        .form-input:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+        /* Custom Select Arrow */
+        select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-submit:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25); }
+        .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* =========================================
+           FAQ SECTION
+           ========================================= */
+        .faq-section { padding: 60px 0 100px; background: white; border-top: 1px solid var(--border-color); }
+        .faq-container { max-width: 800px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 40px; }
+        .section-header h2 { font-family: var(--font-heading); font-size: 28px; margin-bottom: 8px; }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 0;
+        }
+        .faq-question {
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: 600; font-size: 16px; cursor: pointer;
+            transition: color 0.3s;
+        }
+        .faq-question:hover { color: var(--primary); }
+        .faq-question i { transition: transform 0.3s ease; color: var(--primary); }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+        .faq-item.active .faq-answer { max-height: 200px; opacity: 1; margin-top: 12px; }
+        .faq-item.active .faq-question i { transform: rotate(180deg); }
+
+        /* =========================================
+           FOOTER
+           ========================================= */
+        footer { background: #0f172a; color: #cbd5e1; padding: 60px 0 30px; font-size: 14px; }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; }
+        @media(min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+        .footer-col h4 { color: white; margin-bottom: 20px; font-family: var(--font-heading); }
+        .footer-col ul li { margin-bottom: 10px; }
+        .footer-col a:hover { color: white; padding-left: 5px; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+
+        /* =========================================
+           TOAST NOTIFICATION
+           ========================================= */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2000;
+            border-left: 4px solid var(--primary);
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast-icon { color: var(--primary); font-size: 20px; }
+        .toast-content h4 { font-size: 14px; margin-bottom: 2px; font-weight: 700; }
+        .toast-content p { font-size: 12px; color: var(--text-secondary); margin: 0; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Animation Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Header -->
+    <header id="header">
+        <div class="container">
+            <a href="https://ddnex.com">
+                <img src="https://i.ibb.co/dsfCkWFT/DDNEX-05.png" alt="DDNEX®" class="brand-logo">
+            </a>
+            <div class="nav-actions">
+                <a href="https://ddnex.com" class="btn" style="color: var(--text-secondary);">Home</a>
+                <a href="https://ddnex.com/pricing" class="btn btn-primary" target="_blank">Pricing</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            
+            <!-- Hero -->
+            <div class="hero-text reveal">
+                <span class="badge">Support Center</span>
+                <h1>We're here to help.</h1>
+                <p>Select a category below to instantly route your ticket to the right team. We typically respond within 24 hours.</p>
+            </div>
+
+            <div class="support-grid">
+                
+                <!-- Left: Interactive Sidebar -->
+                <aside class="reveal" style="transition-delay: 0.1s;">
+                    
+                    <!-- Option 1: General -->
+                    <div class="info-card" onclick="triggerSelection('general')">
+                        <div class="card-header">
+                            <div class="card-icon"><i class="ri-customer-service-2-line"></i></div>
+                            <div>
+                                <h3 class="card-title">General Support</h3>
+                                <p class="card-desc">Questions, guidance, or account help.</p>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--primary); font-weight: 600;">Routing to: support@ddnex.com &rarr;</div>
+                    </div>
+
+                    <!-- Option 2: Billing -->
+                    <div class="info-card" onclick="triggerSelection('billing')">
+                        <div class="card-header">
+                            <div class="card-icon"><i class="ri-bank-card-line"></i></div>
+                            <div>
+                                <h3 class="card-title">Billing & Finance</h3>
+                                <p class="card-desc">Invoices, payments, and disputes.</p>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #d97706; font-weight: 600;">Routing to: finance@ddnex.com &rarr;</div>
+                    </div>
+
+                    <!-- Option 3: Complaints -->
+                    <div class="info-card" onclick="triggerSelection('complaint')">
+                        <div class="card-header">
+                            <div class="card-icon"><i class="ri-feedback-line"></i></div>
+                            <div>
+                                <h3 class="card-title">Complaints & Feedback</h3>
+                                <p class="card-desc">Report issues or share your thoughts.</p>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #dc2626; font-weight: 600;">Routing to: feedback@ddnex.com &rarr;</div>
+                    </div>
+
+                </aside>
+
+                <!-- Right: Dynamic Form -->
+                <div class="form-wrapper reveal" style="transition-delay: 0.2s;" id="formSection">
+                    <div class="form-header">
+                        <h2>Submit a Ticket</h2>
+                        <p>Fill out the details below.</p>
+                        <div class="routing-indicator" id="routingIndicator">
+                            <i class="ri-flashlight-fill"></i>
+                            <span id="routingText">Ready to send to support@ddnex.com</span>
+                        </div>
+                    </div>
+
+                    <!-- 
+                        IMPORTANT: The 'action' is dynamically changed by JavaScript 
+                        based on the selection. Default is support.
+                    -->
+                    <form id="supportForm" action="https://formsubmit.co/support@ddnex.com" method="POST">
+                        
+                        <!-- Honeypot -->
+                        <input type="text" name="_honey" style="display:none">
+                        
+                        <!-- Config -->
+                        <input type="hidden" name="_subject" value="New Support Ticket: [Type Selected]">
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="hidden" name="_template" value="table">
+                        <!-- Redirect back to this page (or a success page) -->
+                        <input type="hidden" name="_next" value="https://ddnex.com/support">
+
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="Name" class="form-input" placeholder="E.g., Jane Doe" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="Email" class="form-input" placeholder="name@company.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="issueType">Category</label>
+                            <select id="issueType" name="Issue Type" class="form-input" required>
+                                <option value="General Inquiry" selected>General Inquiry</option>
+                                <option value="Technical Support">Technical Support</option>
+                                <option value="Billing / Payment Issue">Billing / Payment Issue</option>
+                                <option value="Complaint / Feedback">Complaint / Feedback</option>
+                                <option value="Feature Request">Feature Request</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="Subject" class="form-input" placeholder="Brief summary of your issue" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="Message" class="form-input" rows="5" placeholder="How can we help you?" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <span>Send Message</span> <i class="ri-send-plane-fill"></i>
+                        </button>
+                        
+                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 16px; text-align: center;">
+                            Your data is secure. Read our <a href="#" style="color: var(--primary); text-decoration: underline;">Privacy Policy</a>.
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <div class="container faq-container">
+                <div class="section-header">
+                    <span class="badge">Self Help</span>
+                    <h2>Frequently Asked Questions</h2>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">How fast will I get a reply? <i class="ri-arrow-down-s-line"></i></div>
+                    <div class="faq-answer">We strive to respond to all support tickets within 24 business hours. Financial disputes may take up to 48 hours to investigate.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Where do billing issues go? <i class="ri-arrow-down-s-line"></i></div>
+                    <div class="faq-answer">If you select "Billing / Payment Issue", your ticket is automatically routed to our finance team at finance@ddnex.com.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Can I talk to a human? <i class="ri-arrow-down-s-line"></i></div>
+                    <div class="faq-answer">Absolutely. While we use automated routing, a real human from DDNEX® will read your message and respond personally.</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="https://i.ibb.co/dsfCkWFT/DDNEX-05.png" alt="DDNEX®" style="height: 24px; margin-bottom: 16px; filter: grayscale(1) brightness(200%); opacity: 0.8;">
+                    <p style="color: #64748b; font-size: 13px; line-height: 1.6; max-width: 300px;">
+                        DDNEX® delivers enterprise-grade digital solutions with premium support.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Status Page</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Connect</h4>
+                    <div style="display: flex; gap: 16px; font-size: 18px;">
+                        <a href="#"><i class="ri-linkedin-fill"></i></a>
+                        <a href="#"><i class="ri-twitter-x-fill"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 DDNEX. All rights reserved.</span>
+                <span style="font-size: 12px; color: #64748b;">Designed for Excellence.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-icon"><i class="ri-checkbox-circle-fill"></i></div>
+        <div class="toast-content">
+            <h4>Message Sent!</h4>
+            <p>Routing successfully. We'll be in touch.</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        /**
+         * 1. DYNAMIC EMAIL ROUTING LOGIC
+         *    Listens to the dropdown or sidebar clicks and changes the form action.
+         */
+        const form = document.getElementById('supportForm');
+        const select = document.getElementById('issueType');
+        const routingIndicator = document.getElementById('routingIndicator');
+        const routingText = document.getElementById('routingText');
+        const submitBtn = document.getElementById('submitBtn');
+        const toast = document.getElementById('toast');
+
+        // Map categories to specific emails
+        const emailRoutes = {
+            'Billing / Payment Issue': 'finance@ddnex.com',
+            'Complaint / Feedback': 'feedback@ddnex.com',
+            'default': 'support@ddnex.com'
+        };
+
+        function updateRouting() {
+            const selectedValue = select.value;
+            let targetEmail = emailRoutes.default;
+            let colorClass = '#166534'; // Green
+
+            // Determine Email
+            if (selectedValue.includes('Billing')) {
+                targetEmail = emailRoutes['Billing / Payment Issue'];
+                colorClass = '#d97706'; // Amber/Orange
+            } else if (selectedValue.includes('Complaint') || selectedValue.includes('Feedback')) {
+                targetEmail = emailRoutes['Complaint / Feedback'];
+                colorClass = '#dc2626'; // Red
+            }
+
+            // Update Form Action
+            form.action = `https://formsubmit.co/${targetEmail}`;
+
+            // Update UI Indicator
+            routingIndicator.classList.add('visible');
+            routingText.innerText = `Routing to: ${targetEmail}`;
+            routingIndicator.style.color = colorClass;
+            routingIndicator.style.background = `${colorClass}15`; // 15 hex = low opacity
+        }
+
+        // Listen for manual dropdown changes
+        select.addEventListener('change', updateRouting);
+
+        // Sidebar Interaction Trigger
+        window.triggerSelection = function(type) {
+            let valueToSelect = 'General Inquiry';
+            
+            if (type === 'billing') valueToSelect = 'Billing / Payment Issue';
+            if (type === 'complaint') valueToSelect = 'Complaint / Feedback';
+            
+            select.value = valueToSelect;
+            updateRouting();
+            
+            // Scroll to form smoothly
+            document.getElementById('formSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Highlight form
+            document.getElementById('formSection').style.boxShadow = "0 0 0 4px rgba(37, 99, 235, 0.2)";
+            setTimeout(() => {
+                document.getElementById('formSection').style.boxShadow = "";
+            }, 1000);
+        };
+
+        // Initialize routing on load
+        updateRouting();
+
+
+        /**
+         * 2. FORM SUBMISSION FEEDBACK
+         */
+        form.addEventListener('submit', function(e) {
+            // Note: FormSubmit handles the actual submission.
+            // We just add visual feedback before the page unloads/redirects.
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Sending...';
+            
+            // Show toast if we were intercepting (for demo purposes)
+            // Since FormSubmit redirects, this toast might only be visible briefly 
+            // or if the _next URL is the same page.
+            setTimeout(() => {
+                showToast();
+            }, 1000);
+        });
+
+        function showToast() {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+
+        /**
+         * 3. SCROLL REVEAL ANIMATION
+         */
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 100;
+            revealElements.forEach((reveal) => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        };
+        window.addEventListener('scroll', revealOnScroll);
+        // Trigger once on load
+        revealOnScroll();
+
+        // Header Scroll Effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+        });
+
+        // FAQ Toggle
+        document.querySelectorAll('.faq-question').forEach(item => {
+            item.addEventListener('click', () => {
+                const parent = item.parentElement;
+                parent.classList.toggle('active');
+            });
+        });
+
+
+        /**
+         * 4. CANVAS BACKGROUND ANIMATION (Connecting Nodes)
+         *    Represents connectivity and support network.
+         */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5; // Slow velocity
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(37, 99, 235, 0.2)'; // Blue tint
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            // Count depends on screen size
+            const count = window.innerWidth < 768 ? 30 : 60;
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                
+                // Draw connections
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 150) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(37, 99, 235, ${0.1 - distance/1500})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateCanvas);
+        }
+
+        initParticles();
+        animateCanvas();
+
+    </script>
+</body>
+</html>
