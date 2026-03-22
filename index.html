@@ -313,6 +313,20 @@
         .routing-indicator.visible { opacity: 1; transform: translateY(0); }
         .routing-indicator i { font-size: 14px; }
 
+        /* Subject Sync Indicator */
+        .subject-sync {
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .subject-sync.visible { opacity: 1; }
+        .subject-sync i { color: var(--primary); }
+
         .form-group { margin-bottom: 20px; position: relative; }
         .form-group label {
             display: block;
@@ -498,9 +512,17 @@
                     <div class="form-header">
                         <h2>Submit a Ticket</h2>
                         <p>Fill out the details below.</p>
+                        
+                        <!-- Email Routing Indicator -->
                         <div class="routing-indicator" id="routingIndicator">
                             <i class="ri-flashlight-fill"></i>
                             <span id="routingText">Ready to send to support@ddnex.com</span>
+                        </div>
+                        
+                        <!-- NEW: Subject Sync Indicator -->
+                        <div class="subject-sync" id="subjectSync">
+                            <i class="ri-edit-circle-line"></i>
+                            <span id="subjectText">Email Subject will match your summary.</span>
                         </div>
                     </div>
 
@@ -514,7 +536,8 @@
                         <input type="text" name="_honey" style="display:none">
                         
                         <!-- Config -->
-                        <input type="hidden" name="_subject" value="New Support Ticket: [Type Selected]">
+                        <!-- Subject is dynamically updated via JS -->
+                        <input type="hidden" name="_subject" id="emailSubject" value="New Support Ticket">
                         <input type="hidden" name="_captcha" value="false">
                         <input type="hidden" name="_template" value="table">
                         <!-- Redirect back to this page (or a success page) -->
@@ -544,6 +567,9 @@
                         <div class="form-group">
                             <label for="subject">Subject</label>
                             <input type="text" id="subject" name="Subject" class="form-input" placeholder="Brief summary of your issue" required>
+                            <small style="display:block; margin-top:5px; color:var(--text-muted); font-size:11px;">
+                                * This will be used as the email title.
+                            </small>
                         </div>
 
                         <div class="form-group">
@@ -578,6 +604,10 @@
                 <div class="faq-item">
                     <div class="faq-question">Where do billing issues go? <i class="ri-arrow-down-s-line"></i></div>
                     <div class="faq-answer">If you select "Billing / Payment Issue", your ticket is automatically routed to our finance team at finance@ddnex.com.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">What will the email subject be? <i class="ri-arrow-down-s-line"></i></div>
+                    <div class="faq-answer">The subject line of the email we receive will be exactly what you type in the "Subject" field, ensuring we understand your request immediately.</div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-question">Can I talk to a human? <i class="ri-arrow-down-s-line"></i></div>
@@ -639,13 +669,22 @@
     <!-- Scripts -->
     <script>
         /**
-         * 1. DYNAMIC EMAIL ROUTING LOGIC
-         *    Listens to the dropdown or sidebar clicks and changes the form action.
+         * 1. DYNAMIC EMAIL ROUTING & SUBJECT LOGIC
+         *    Listens to the dropdown or sidebar clicks.
+         *    Updates the 'action' (email destination).
+         *    Updates the '_subject' (email title based on input).
          */
         const form = document.getElementById('supportForm');
         const select = document.getElementById('issueType');
+        const subjectInput = document.getElementById('subject');
+        const emailSubjectInput = document.getElementById('emailSubject');
+        
+        // UI Elements
         const routingIndicator = document.getElementById('routingIndicator');
         const routingText = document.getElementById('routingText');
+        const subjectSync = document.getElementById('subjectSync');
+        const subjectText = document.getElementById('subjectText');
+        
         const submitBtn = document.getElementById('submitBtn');
         const toast = document.getElementById('toast');
 
@@ -656,12 +695,14 @@
             'default': 'support@ddnex.com'
         };
 
-        function updateRouting() {
+        // Function to update both routing (Email) and Subject
+        function updateFormState() {
             const selectedValue = select.value;
+            const subjectValue = subjectInput.value.trim();
             let targetEmail = emailRoutes.default;
             let colorClass = '#166534'; // Green
 
-            // Determine Email
+            // --- 1. Determine Email Destination ---
             if (selectedValue.includes('Billing')) {
                 targetEmail = emailRoutes['Billing / Payment Issue'];
                 colorClass = '#d97706'; // Amber/Orange
@@ -673,15 +714,33 @@
             // Update Form Action
             form.action = `https://formsubmit.co/${targetEmail}`;
 
-            // Update UI Indicator
+            // Update Routing UI
             routingIndicator.classList.add('visible');
             routingText.innerText = `Routing to: ${targetEmail}`;
             routingIndicator.style.color = colorClass;
             routingIndicator.style.background = `${colorClass}15`; // 15 hex = low opacity
+
+
+            // --- 2. Update Email Subject (New Requirement) ---
+            if (subjectValue.length > 0) {
+                // Set the hidden _subject input to the client's typed subject
+                emailSubjectInput.value = subjectValue;
+                
+                // Show visual feedback that it's synced
+                subjectSync.classList.add('visible');
+                subjectText.innerText = `Email Subject: "${subjectValue}"`;
+            } else {
+                // Fallback if subject is empty (default)
+                emailSubjectInput.value = `New ${selectedValue} Ticket`;
+                subjectSync.classList.remove('visible');
+            }
         }
 
-        // Listen for manual dropdown changes
-        select.addEventListener('change', updateRouting);
+        // Listen for dropdown changes (affects routing)
+        select.addEventListener('change', updateFormState);
+
+        // Listen for Subject Input changes (affects email title)
+        subjectInput.addEventListener('input', updateFormState);
 
         // Sidebar Interaction Trigger
         window.triggerSelection = function(type) {
@@ -691,7 +750,7 @@
             if (type === 'complaint') valueToSelect = 'Complaint / Feedback';
             
             select.value = valueToSelect;
-            updateRouting();
+            updateFormState();
             
             // Scroll to form smoothly
             document.getElementById('formSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -704,7 +763,7 @@
         };
 
         // Initialize routing on load
-        updateRouting();
+        updateFormState();
 
 
         /**
